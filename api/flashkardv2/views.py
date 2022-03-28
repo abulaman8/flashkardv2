@@ -420,7 +420,7 @@ def edit_deck(deck_name):
 
 @check_token
 @views.route('/import', methods = ['POST', 'GET'])
-def import_deck(d):
+def import_deck():
     if request.method == 'POST':
         token = request.headers.get('token')
         data = jwt.decode(token, current_app.config['SECRET_KEY'])
@@ -449,6 +449,7 @@ def import_deck(d):
                             return make_response({'message': 'Deck Import failed'}, 403)
                 return make_response({'message': 'Deck imported successfully'}, 200)
             return make_response({'message': 'Only Csv files allowed...'}, 403)
+        return make_response({'message':'File not recieved...'}, 401)
 
 
 
