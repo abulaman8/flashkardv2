@@ -2,9 +2,9 @@
   <div class="backdrop" @click.self="closeModal">
       <div class="modal">
           <!-- <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione esse, cumque tempora ullam reiciendis alias molestias, pariatur rem accusantium nihil ut quae eius doloremque minima dolorum tempore reprehenderit eos vero debitis et aliquid natus sequi quasi! Incidunt quaerat eligendi recusandae non ratione quos labore? Voluptates soluta distinctio quibusdam atque voluptatum similique tempore facilis quis modi odio assumenda aut iusto nesciunt in repudiandae, qui dolorum praesentium molestias? Tempora excepturi dolores quod adipisci cumque quis, dolorum ex vero doloribus. In ad deserunt enim eaque illo quae eum fugiat quis quibusdam aut ipsum veritatis ratione corporis quod facere, recusandae, nesciunt perferendis dolore suscipit!</p> -->
-           <form @submit.prevent="addDeck">
-            <label for="deckname">Select File:</label>
-            <input type="file" name="deckname" required>
+           <form @submit.prevent="addDeck" method="POST">
+            <label for="csvfile">Select File:</label>
+            <input type="file" @change="addDeck" name="csvfile" required>
 
 
             <center>
@@ -27,6 +27,30 @@ export default {
         addDeck(){
             this.$emit('importdeck')
             console.log('add emitted')
+            this.form.icon = e.target.files[0];
+            let formData = new FormData();
+
+            formData.append( 'method', this.form.method );
+            formData.append( 'icon', this.form.icon );
+
+            fetch(
+				"http://localhost:5000/import",
+				{
+				method: "POST",
+				body: formData,
+				headers:{
+					"Content-Type":"multipart/form-data",
+                    "token": localStorage.getItem("token")
+				},
+				
+
+				}
+			).then(function(response) {
+				return response.json()
+			}).then(function(rdata) {
+				console.log(rdata)
+			})
+
         }
     }
 
