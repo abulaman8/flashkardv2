@@ -55,8 +55,10 @@ export default {
 			).then(function(response) {
 				return response.json()
 			}).then(function(rdata) {
-				console.log(rdata)
+				localStorage.setItem("token", rdata.token)
+                console.log(localStorage.getItem("token"))
 			})
+            this.$router.push('/')
 				
 
 		}
@@ -66,10 +68,17 @@ export default {
 </script>
 
 <style>
-    body{
+body{
+  --primaryGreen: #1a472a;
+  --secondaryGreen: #2a623d;
+  --primaryGrey: #5d5d5d;
+  --secondaryGrey: #dddddd;
+  --black: 	#000000;
+}
+    /* body{
         width: 100%;
-        background-color: #eee;
-    }
+        background-color: var(--secondaryGrey);
+    } */
     .box{
         max-width: 420px;
         margin: 30px auto;
@@ -97,7 +106,7 @@ export default {
 
     }
     button{
-        background-color: grey;
+        background: #2a623d;
         color: white;
         padding: 10px;
         margin: 20px;

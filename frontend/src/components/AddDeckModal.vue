@@ -19,14 +19,44 @@
 
 <script>
 export default {
+
+    data(){
+        return{
+            deckname:''
+        }
+            
+        
+    },
     methods: {
         closeModal(){
             this.$emit('close')
             console.log('closing')
         },
-        addDeck(){
-            this.$emit('adddeck')
+        addDeck(e){
+            this.$emit('adddeck', this.deckname)
+            console.log(this.deckname)
             console.log('add emitted')
+            let data = {
+                "deck_name":this.deckname,
+                "cards":[]
+            }
+            fetch(
+				"http://localhost:5000/create-deck",
+				{
+				method: "POST",
+				body: JSON.stringify(data),
+				headers:{
+					"Content-Type":"application/json",
+                    "token": localStorage.getItem("token")
+				},
+				
+
+				}
+			).then(function(response) {
+				return response.json()
+			}).then(function(rdata) {
+				console.log(rdata)
+			})
         }
     }
 
@@ -41,6 +71,11 @@ export default {
         background: white;
         border-radius: 10px;
         text-align: left;
+        z-index: 15;
+        position: absolute;
+        transform-style: preserve-3d;
+        top: 10%;
+        left: 30%;
     }
     .backdrop{
         top: 0;

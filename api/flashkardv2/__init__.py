@@ -11,6 +11,8 @@ from flask_mail import Mail
 from celery import Celery
 from flask_cors import CORS
 from flask_caching import Cache
+from celery.schedules import crontab, timedelta
+from pytz import timezone
 
 # from flask_apscheduler import APScheduler
 
@@ -39,8 +41,10 @@ celery = Celery(
     backend='redis://localhost:6379/0',
     broker='redis://localhost:6379/0',
     # include=['flashkardv2.views'],
-    imports = ('flashkardv2.views')
+    imports = ('flashkardv2.views'),
+    
 )
+
 
 # scheduler = APScheduler()
 DB_NAME = "project.sqlite3"
@@ -64,6 +68,14 @@ def create_app():
     app.config['MAIL_ASCII_ATTACHMENTS'] = False
     app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
     app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+    app.config['CELERYBEAT_SCHEDULE'] = {
+    # Executes every minute
+    'periodic_task-every-minute': {
+        'task': 'flashkardv2.views.reminder',
+        'schedule':crontab(minute=9, hour='*')
+    }
+}
+
     db.init_app(app)
     mail.init_app(app)
     cache.init_app(app)

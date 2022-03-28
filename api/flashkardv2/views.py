@@ -1,6 +1,7 @@
 
 from re import T
 from celery import Celery
+from celery.schedules import crontab
 from flask import Blueprint, render_template, request,make_response, jsonify, current_app, request_finished, copy_current_request_context
 from flask.helpers import send_file
 from functools import wraps
@@ -17,6 +18,8 @@ from . import mail
 from flask_mail import Message
 from . import celery
 from . import cache
+
+
 
 
 
@@ -79,6 +82,15 @@ def monthly_report(username):
         user = User.query.filter_by(username= username).first()
         decks = Deck.query.filter_by(user = username)
         deck_list = [deck for deck in decks]
+
+
+@celery.task
+def reminder():
+    with current_app.app_context():
+        msg = Message(recipients=['abulaman6@gmail.com',])
+        msg.body='hello'
+    mail.send(msg)
+    print('job done')
         
 
 
@@ -197,9 +209,9 @@ def create_deck():
     deck_name = cardsjson['deck_name']
     cards = cardsjson['cards']
     # jsonify(cards)
-    print(cards)
-    print(cards[0])
-    print(type(cards[0]))
+    # print(cards)
+    # print(cards[0])
+    # print(type(cards[0]))
 
     if Deck.query.filter_by(user = username, deck_name=deck_name).first():
         return make_response({'message': 'Deck Already Exists'}, 403)
@@ -209,13 +221,14 @@ def create_deck():
         db.session.commit()
     except:
         return make_response({'message': 'Deck Not Created.'}, 403)
-    for card in cards:
-        new_card = Card(front = card['front'], back = card['back'], deck = deck_name)
-        try:
-            db.session.add(new_card)
-            db.session.commit()
-        except:
-            return make_response({'message': 'Deck Not Created.'}, 403)
+    if len(cards)>0:
+        for card in cards:
+            new_card = Card(front = card['front'], back = card['back'], deck = deck_name)
+            try:
+                db.session.add(new_card)
+                db.session.commit()
+            except:
+                return make_response({'message': 'Deck Not Created.'}, 403)
     return make_response({'message': 'Deck created successfully'}, 200)
 
 
@@ -345,12 +358,12 @@ def edit_deck(deck_name):
             
             for card in cards:
                 if card['delete'] == 'yes':
-                    del_card = Card.query.flter_by(card_id = int(card['id'])).first()
+                    del_card = Card.query.filter_by(card_id = int(card['id'])).first()
                     db.session.delete(del_card)
                     try:
                         db.session.commit()
                     except:
-                        return make_response({'message': 'Deck edit failed'}, 403)
+                        return make_response({'message': 'Deck edit failed 1'}, 403)
                 elif card['id'] != 'null' and card['delete'] == 'no':
                     edit_card = Card.query.filter_by(card_id = int(card['id']), deck=deck_name).first()
                     if edit_card:
@@ -359,21 +372,21 @@ def edit_deck(deck_name):
                         try:
                             db.session.commit()
                         except:
-                            return make_response({'message': 'Deck edit failed'},403)
-                    return make_response({'message': 'Deck edit failed'}, 403)
+                            return make_response({'message': 'Deck edit failed 2'},403)
+                    return make_response({'message': 'Deck edit failed 3'}, 403)
                 elif card['id'] == 'null' and card['delete'] == 'no':
                     new_card = Card(front = card['front'], back = card['back'], deck = deck_name)
                     try:
                         db.session.add(new_card)
                         db.session.commit()
                     except:
-                        return make_response({'message': 'Deck edit failed'},403)  
+                        return make_response({'message': 'Deck edit failed 4'},403)  
             if deckjson['deck_name'] != deck_name:
                 edit_deck.deck_name = deckjson['deck_name']
                 try:
                     db.session.commit()
                 except:
-                    return make_response({'message': 'Deck edit failed'}, 403)
+                    return make_response({'message': 'Deck edit failed 5'}, 403)
             return make_response({'message': 'Deck editted Successfully'}, 200)
 
         

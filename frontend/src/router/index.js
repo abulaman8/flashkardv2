@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
+import ManageDeck from '../views/ManageDeck.vue'
+import ReviewDeck from '../views/ReviewDeck.vue'
+import DeckControl from '../views/DeckControl.vue'
 
 const routes = [{
         path: '/',
@@ -26,7 +29,24 @@ const routes = [{
         path: '/register',
         name: 'Register',
         component: Register
-    }
+    },
+    {
+        path: '/manage-deck',
+        name: 'Manage',
+        component: ManageDeck
+    },
+    {
+        path: '/review',
+        name: 'Review',
+        component: ReviewDeck,
+        props: true,
+    },
+    {
+        path: '/deck-control',
+        name: 'DeckControl',
+        component: DeckControl,
+        props: true,
+    },
 ]
 
 const router = createRouter({
